@@ -11,7 +11,7 @@ import Row from "../dawn-ui/components/Row";
 import Sidebar from "../dawn-ui/components/Sidebar";
 import SidebarButton from "../dawn-ui/components/SidebarButton";
 import TaskList, { ListType } from "./tasks/TaskList";
-import useTasks from "./hooks/useTasks";
+import useMainHook from "./hooks/useMainHook";
 import showTaskEditor from "./tasks/TaskEditor";
 import {
   registerShortcut,
@@ -41,7 +41,7 @@ registerShortcut("log-mood", {
 });
 
 export default function Kairo() {
-  const tasks = useTasks();
+  const tasks = useMainHook();
   const [page, _setPage] = useState<string>("all");
 
   useEffect(() => {
@@ -106,7 +106,11 @@ export default function Kairo() {
   }
 
   return (
-    <Row className="full-page" style={{ position: "relative" }}>
+    <Row
+      className="full-page"
+      util={["no-gap"]}
+      style={{ position: "relative" }}
+    >
       <FAB shortcut={"new-task"} clicked={handleCreateTask} />
       <Sidebar>
         <Column style={{ gap: "5px" }}>
@@ -244,7 +248,14 @@ export default function Kairo() {
           />
         </Column>
       </Sidebar>
-      <Content style={{ width: "100%", overflow: "auto" }}>
+      <Content
+        style={{
+          width: "100%",
+          overflow: "auto",
+          margin: "0px",
+          padding: "20px",
+        }}
+      >
         {page.startsWith("view_mood_details") ? (
           <MoodHistoryForDate date={page.split("@")[1]} hook={tasks} />
         ) : (

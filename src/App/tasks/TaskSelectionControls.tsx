@@ -4,7 +4,7 @@ import { showConfirmModel } from "../../dawn-ui/components/AlertManager";
 import Column from "../../dawn-ui/components/Column";
 import GoogleMatieralIcon from "../../dawn-ui/components/GoogleMaterialIcon";
 import { Task } from "../types";
-import { TaskHookType } from "../hooks/useTasks";
+import { TaskHookType } from "../hooks/useMainHook";
 
 export function TaskSelectionControls({
   selected,

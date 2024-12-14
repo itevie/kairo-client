@@ -15,6 +15,7 @@ export function filterTasks(tasks: Task[], query: string): Task[] {
   const regex = new RegExp(query, "gi");
   return tasks.filter(
     (x) =>
+      x.id.toString().match(regex) ||
       x.title.match(regex) ||
       x.note?.match(regex) ||
       x.due?.match(regex) ||

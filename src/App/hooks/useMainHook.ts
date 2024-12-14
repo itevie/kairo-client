@@ -14,9 +14,9 @@ import { Group, MoodLog, Task } from "../types";
 import { DawnTime } from "../../dawn-ui/time";
 import showMoodLogger from "../MoodLogger";
 
-export type TaskHookType = ReturnType<typeof useTasks>;
+export type TaskHookType = ReturnType<typeof useMainHook>;
 
-export default function useTasks() {
+export default function useMainHook() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [moods, setMoods] = useState<MoodLog[]>([]);

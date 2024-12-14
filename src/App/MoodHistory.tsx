@@ -1,6 +1,6 @@
 import Calendar from "react-calendar";
 import Container from "../dawn-ui/components/Container";
-import useTasks from "./hooks/useTasks";
+import useMainHook from "./hooks/useMainHook";
 import { DawnTime } from "../dawn-ui/time";
 import { useEffect, useMemo, useState } from "react";
 import { MoodLog } from "./types";
@@ -22,7 +22,7 @@ export default function MoodHistory({
   hook,
   setPage,
 }: {
-  hook: ReturnType<typeof useTasks>;
+  hook: ReturnType<typeof useMainHook>;
   setPage: Function;
 }) {
   const [historyData, setHistoryData] = useState<ChartConfiguration | null>(

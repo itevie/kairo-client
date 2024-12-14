@@ -1,17 +1,18 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Column from "../../dawn-ui/components/Column";
 import Container from "../../dawn-ui/components/Container";
-import { showContextMenu } from "../../dawn-ui/components/ContextMenuManager";
 import Row from "../../dawn-ui/components/Row";
 import { DawnTime } from "../../dawn-ui/time";
-import showTaskEditor from "./TaskEditor";
 import { Task } from "../types";
 import { setShortcutCallback } from "../../dawn-ui/components/ShortcutManager";
 import { combineClasses } from "../../dawn-ui/util";
 import { spawnConfetti } from "../../dawn-ui/confetti";
 import { TaskSelectionControls } from "./TaskSelectionControls";
 import { filterTasks, groupTasks } from "./taskFiltering";
-import { TaskHookType } from "../hooks/useTasks";
+import { TaskHookType } from "../hooks/useMainHook";
+import showTaskContextMenu from "./taskContext";
+import Button from "../../dawn-ui/components/Button";
+import { showInfoAlert } from "../../dawn-ui/components/AlertManager";
 
 export type ListType =
   | "due"
@@ -37,6 +38,11 @@ export default function TaskList({
   const [query, setQuery] = useState<string>("");
   const [selected, setSelected] = useState<number[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setQuery("");
+    if (inputRef.current) inputRef.current.value = "";
+  }, [type]);
 
   let tasks = hook.tasks
     .filter(filters[type || "all"] || (() => true))
@@ -65,12 +71,37 @@ export default function TaskList({
 
   return (
     <Column>
-      <input
-        ref={inputRef}
-        placeholder="Search tasks..."
-        className="dawn-big dawn-page-input"
-        onChange={(e) => setQuery(e.currentTarget.value)}
-      />
+      <Row>
+        <input
+          style={{ flexGrow: "1", width: "100%" }}
+          ref={inputRef}
+          placeholder="Search tasks..."
+          className="dawn-big dawn-page-input"
+          onChange={(e) => setQuery(e.currentTarget.value)}
+        />
+        <Row style={{ flexShrink: "1", width: "fit-content" }}>
+          <Button
+            className="dawn-button-round"
+            onClick={() => {
+              let randomTasks = Object.values(data)
+                .flat(1)
+                .filter((x) => !x.finished);
+              if (randomTasks.length === 0)
+                return showInfoAlert(
+                  `Oops! Looks like you've completed all the tasks in this tab. Well-done!`
+                );
+              let randomTask =
+                randomTasks[
+                  Math.floor(Math.random() * randomTasks.length)
+                ].id.toString();
+              if (inputRef.current) inputRef.current.value = randomTask;
+              setQuery(randomTask);
+            }}
+          >
+            Random
+          </Button>
+        </Row>
+      </Row>
       {selected.length > 0 && (
         <div style={{ textAlign: "center" }}>
           <hr />
@@ -113,43 +144,15 @@ export default function TaskList({
                       else setSelected((old) => [...old, x.id]);
                     }
                   }}
-                  onContextMenu={(e) => {
-                    showContextMenu({
+                  onContextMenu={(e) =>
+                    showTaskContextMenu({
                       event: e,
-                      elements: [
-                        {
-                          label: "Select",
-                          type: "button",
-                          onClick: () => {
-                            setSelected((old) => [...old, x.id]);
-                          },
-                        },
-                        {
-                          label: "Edit",
-                          type: "button",
-                          onClick: async () => {
-                            const result = await showTaskEditor(
-                              type ?? "",
-                              hook.groups,
-                              x,
-                              true
-                            );
-                            if (!result) return;
-                            await hook.updateTask(x.id, result);
-                          },
-                        },
-                        {
-                          type: "seperator",
-                        },
-                        {
-                          label: "Delete",
-                          type: "button",
-                          scheme: "danger",
-                          onClick: () => hook.deleteTask(x.id),
-                        },
-                      ],
-                    });
-                  }}
+                      type,
+                      hook,
+                      task: x,
+                      setSelected,
+                    })
+                  }
                   key={x.id}
                   util={["no-min"]}
                   style={{ width: "100%" }}
