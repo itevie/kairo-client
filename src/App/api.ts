@@ -8,6 +8,7 @@ axiosClient.config.withCredentials = true;
 axiosClient.config.headers = {
   Authorization: "Bearer Guest",
 };
+
 // ----- Tasks -----
 
 export async function fetchTasks() {

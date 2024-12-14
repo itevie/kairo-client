@@ -10,12 +10,12 @@ import FAB from "../dawn-ui/components/FAB";
 import Row from "../dawn-ui/components/Row";
 import Sidebar from "../dawn-ui/components/Sidebar";
 import SidebarButton from "../dawn-ui/components/SidebarButton";
-import TaskList, { ListType } from "./TaskList";
+import TaskList, { ListType } from "./tasks/TaskList";
 import useTasks from "./hooks/useTasks";
-import showTaskEditor from "./TaskEditor";
+import showTaskEditor from "./tasks/TaskEditor";
 import {
   registerShortcut,
-  setCallback,
+  setShortcutCallback,
 } from "../dawn-ui/components/ShortcutManager";
 import showMoodLogger from "./MoodLogger";
 import SettingsPage from "./SettingsPage";
@@ -55,7 +55,7 @@ export default function Kairo() {
       setPage(window.location.hash.replace("#", ""));
     });
 
-    setCallback("settings", () => {
+    setShortcutCallback("settings", () => {
       setPage("settings");
     });
 

@@ -1,6 +1,9 @@
-import { addAlert, showErrorAlert } from "../dawn-ui/components/AlertManager";
-import { DawnTime } from "../dawn-ui/time";
-import { Group, Task } from "./types";
+import {
+  addAlert,
+  showErrorAlert,
+} from "../../dawn-ui/components/AlertManager";
+import { DawnTime } from "../../dawn-ui/time";
+import { Group, Task } from "../types";
 
 export default async function showTaskEditor(
   page: string,
