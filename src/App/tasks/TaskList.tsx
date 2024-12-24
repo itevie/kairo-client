@@ -1,18 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import Column from "../../dawn-ui/components/Column";
-import Container from "../../dawn-ui/components/Container";
 import Row from "../../dawn-ui/components/Row";
-import { DawnTime } from "../../dawn-ui/time";
 import { Task } from "../types";
 import { setShortcutCallback } from "../../dawn-ui/components/ShortcutManager";
-import { combineClasses } from "../../dawn-ui/util";
-import { spawnConfetti } from "../../dawn-ui/confetti";
 import { TaskSelectionControls } from "./TaskSelectionControls";
 import { filterTasks, groupTasks } from "./taskFiltering";
 import { TaskHookType } from "../hooks/useMainHook";
-import showTaskContextMenu from "./taskContext";
 import Button from "../../dawn-ui/components/Button";
 import { showInfoAlert } from "../../dawn-ui/components/AlertManager";
+import TaskGroup from "./TaskGroup";
+import { getSearchResults } from "../../dawn-ui/seacher";
 
 export type ListType =
   | "due"
@@ -76,7 +73,7 @@ export default function TaskList({
           style={{ flexGrow: "1", width: "100%" }}
           ref={inputRef}
           placeholder="Search tasks..."
-          className="dawn-big dawn-page-input"
+          className="dawn-big dawn-page-input dawn-shrink"
           onChange={(e) => setQuery(e.currentTarget.value)}
         />
         <Row style={{ flexShrink: "1", width: "fit-content" }}>
@@ -86,14 +83,16 @@ export default function TaskList({
               let randomTasks = Object.values(data)
                 .flat(1)
                 .filter((x) => !x.finished);
+
               if (randomTasks.length === 0)
                 return showInfoAlert(
                   `Oops! Looks like you've completed all the tasks in this tab. Well-done!`
                 );
-              let randomTask =
-                randomTasks[
-                  Math.floor(Math.random() * randomTasks.length)
-                ].id.toString();
+
+              let randomTask = `id=${randomTasks[
+                Math.floor(Math.random() * randomTasks.length)
+              ].id.toString()}`;
+
               if (inputRef.current) inputRef.current.value = randomTask;
               setQuery(randomTask);
             }}
@@ -115,87 +114,24 @@ export default function TaskList({
         </div>
       )}
       {Object.keys(data)
-        .filter((x) => filterTasks(data[x], query).length > 0)
+        .filter(
+          (x) =>
+            getSearchResults({
+              data: data[x],
+              query,
+              keyCheck: ["title", "note"],
+            }).length > 0
+        )
         .map((k) => (
-          <>
-            <label>
-              {k}
-              {k.length !== 0 ? " - " : ""}
-              {filterTasks(data[k], query).length} items{" "}
-            </label>
-            <Column style={{ margin: "3px" }}>
-              {filterTasks(data[k], query).map((x) => (
-                <Container
-                  className={combineClasses(
-                    x.due &&
-                      !x.finished &&
-                      Date.now() - new Date(x.due).getTime() > 0
-                      ? "dawn-danger"
-                      : "",
-                    selected.includes(x.id) ? "dawn-selected" : ""
-                  )}
-                  onClick={(e) => {
-                    if (e.ctrlKey) {
-                      if (selected.includes(x.id))
-                        setSelected((old) => {
-                          old.splice(old.indexOf(x.id), 1);
-                          return [...old];
-                        });
-                      else setSelected((old) => [...old, x.id]);
-                    }
-                  }}
-                  onContextMenu={(e) =>
-                    showTaskContextMenu({
-                      event: e,
-                      type,
-                      hook,
-                      task: x,
-                      setSelected,
-                    })
-                  }
-                  key={x.id}
-                  util={["no-min"]}
-                  style={{ width: "100%" }}
-                >
-                  <Row>
-                    <input
-                      onClick={(e) => {
-                        if (!x.finished) {
-                          if (
-                            (localStorage.getItem("kairo-show-confetti") ??
-                              "true") === "true"
-                          )
-                            spawnConfetti(e.pageX, e.pageY);
-                        }
-                        hook.updateTask(x.id, { finished: !x.finished });
-                      }}
-                      readOnly
-                      checked={x.finished}
-                      type="checkbox"
-                    />
-                    <Column>
-                      <label>{x.title}</label>
-                      {x.note ? (
-                        <label style={{ fontSize: "0.8em" }}>{x.note}</label>
-                      ) : (
-                        ""
-                      )}
-                      {(x.due || x.repeat) && (
-                        <small>
-                          {x.due ? `Due: ${x.due} ` : ""}
-                          {x.repeat
-                            ? `Repeat: ${new DawnTime(
-                                x.repeat || 0
-                              ).toString()}`
-                            : ""}
-                        </small>
-                      )}
-                    </Column>
-                  </Row>
-                </Container>
-              ))}
-            </Column>
-          </>
+          <TaskGroup
+            group={k}
+            data={data}
+            selected={selected}
+            setSelected={setSelected}
+            query={query}
+            hook={hook}
+            type={type}
+          />
         ))}
     </Column>
   );
