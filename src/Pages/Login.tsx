@@ -17,6 +17,7 @@ export default function Login() {
       </Navbar>
       <Page>
         <Container title="Login to Kairo">
+          <label>Please login with dawn.rest to continue.</label>
           <Link href={`https://auth.dawn.rest/oauth?cb=${apiUrl}/auth/dawn`}>
             <Button big>Login with dawn.rest</Button>
           </Link>

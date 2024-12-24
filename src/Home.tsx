@@ -23,7 +23,7 @@ export default function App() {
               Open App
             </Button>
             <Button big onClick={() => (window.location.href = "/login")}>
-              Sign Up
+              Login
             </Button>
           </Row>
         </Container>

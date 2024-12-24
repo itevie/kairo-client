@@ -113,7 +113,7 @@ export default function Kairo() {
     >
       <FAB shortcut={"new-task"} clicked={handleCreateTask} />
       <Sidebar>
-        <Column style={{ gap: "5px" }}>
+        <Column util={["no-select"]} style={{ gap: "5px" }}>
           {(localStorage.getItem("kairo-show-mood") ?? "true") === "true" && (
             <>
               <SidebarButton
