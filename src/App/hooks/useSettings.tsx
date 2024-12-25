@@ -1,5 +1,13 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { showErrorAlert } from "../../dawn-ui/components/AlertManager";
+import { fetchUser, updateSettings } from "../api";
+import { setTheme, themeSetBackground } from "../../dawn-ui";
 
 interface KairoSettings {
   useTransparency: boolean;
@@ -11,6 +19,10 @@ interface KairoSettings {
   showMood: boolean;
   useMoodColors: boolean;
   userMoods: string[];
+  syncAppearance: boolean;
+  syncMoodLogger: boolean;
+  backgroundImage: string;
+  theme: string;
 }
 
 const typeMap: Record<
@@ -26,6 +38,10 @@ const typeMap: Record<
   showMood: "boolean",
   useMoodColors: "boolean",
   userMoods: "string[]",
+  syncAppearance: "boolean",
+  syncMoodLogger: "boolean",
+  backgroundImage: "string",
+  theme: "string",
 };
 
 const defaults: KairoSettings = {
@@ -38,7 +54,28 @@ const defaults: KairoSettings = {
   showMood: true,
   useMoodColors: true,
   userMoods: ["sad", "dissatisfied", "neutral", "satisfied", "very_satisfied"],
+  syncAppearance: false,
+  syncMoodLogger: false,
+  backgroundImage: "",
+  theme: "dark",
 };
+
+const appearanceKeys: (keyof KairoSettings)[] = [
+  "useTransparency",
+  "defaultPage",
+  "showConfetti",
+  "syncAppearance",
+  "backgroundImage",
+  "theme",
+];
+
+const moodLoggerKeys: (keyof KairoSettings)[] = [
+  "promptMood",
+  "showMood",
+  "useMoodColors",
+  "userMoods",
+  "syncMoodLogger",
+];
 
 const SharedDataContext = createContext<{
   settings: KairoSettings;
@@ -50,6 +87,44 @@ const SharedDataContext = createContext<{
 
 export function SettingsDataProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<KairoSettings>(loadSettings());
+
+  useEffect(() => {
+    (async () => {
+      const x = await fetchUser();
+      setSettings((old) => {
+        const result = JSON.parse(x.data.settings);
+        const set: Partial<KairoSettings> = {};
+
+        if (result.syncAppearance)
+          for (const key of appearanceKeys)
+            if (key in result) {
+              if (result[key] !== settings[key]) {
+                localStorage.setItem(`kairo-${key}`, result[key]);
+                if (key === "backgroundImage") themeSetBackground(result[key]);
+                if (key === "theme") setTheme(result[key]);
+              }
+              set[key] = result[key];
+            }
+
+        if (result.syncMoodLogger)
+          for (const key of moodLoggerKeys)
+            if (key in result) set[key] = result[key];
+
+        return { ...old, ...set };
+      });
+    })();
+  }, []);
+
+  function constructSync(): Partial<KairoSettings> {
+    const result: Partial<KairoSettings> = {};
+    if (settings.syncAppearance)
+      for (const key of appearanceKeys)
+        if (key in settings) result[key] = settings[key] as any;
+    if (settings.syncMoodLogger)
+      for (const key of moodLoggerKeys)
+        if (key in settings) result[key] = settings[key] as any;
+    return result;
+  }
 
   function setSetting<T extends keyof KairoSettings>(
     key: T,
@@ -64,6 +139,12 @@ export function SettingsDataProvider({ children }: { children: ReactNode }) {
     setSettings((old) => {
       return { ...old, [key]: value };
     });
+
+    (async () => {
+      const toSync = constructSync();
+      toSync[key] = value;
+      await updateSettings(JSON.stringify(toSync));
+    })();
   }
 
   return (

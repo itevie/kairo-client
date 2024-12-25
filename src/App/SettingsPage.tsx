@@ -34,7 +34,22 @@ export default function SettingsPage({
     <Column util={["no-gap"]}>
       <Words type="page-title">Settings</Words>
       <Container>
-        <Words type="heading">Appearance</Words>
+        {/* Appearance Settings */}
+        <Row>
+          <Words type="heading">Appearance</Words>
+          <Row util={["align-center", "small-gap"]}>
+            <input
+              type="checkbox"
+              defaultChecked={settings.syncAppearance}
+              checked={settings.syncAppearance}
+              onChange={(e) => {
+                console.log(settings.syncAppearance);
+                setSetting("syncAppearance", e.currentTarget.checked);
+              }}
+            />
+            <label>Sync?</label>
+          </Row>
+        </Row>
         <table style={{ borderSpacing: "10px" }}>
           <tbody>
             <tr>
@@ -61,15 +76,16 @@ export default function SettingsPage({
                 </select>
               </td>
             </tr>
+
             <tr>
               <td>
                 <label>Theme</label>
               </td>
               <td>
                 <select
-                  defaultValue={localStorage.getItem("kairo-theme") || "dark"}
+                  defaultValue={settings.theme}
                   onChange={(e) => {
-                    localStorage.setItem("kairo-theme", e.currentTarget.value);
+                    setSetting("theme", e.currentTarget.value);
                     setTheme(e.currentTarget.value as any);
                   }}
                 >
@@ -86,14 +102,9 @@ export default function SettingsPage({
               </td>
               <td>
                 <input
-                  defaultValue={
-                    localStorage.getItem("kairo-background-url") || ""
-                  }
+                  defaultValue={settings.backgroundImage}
                   onChange={(e) => {
-                    localStorage.setItem(
-                      "kairo-background-url",
-                      e.currentTarget.value
-                    );
+                    setSetting("backgroundImage", e.currentTarget.value);
                     themeSetBackground(e.currentTarget.value);
                   }}
                 />
@@ -107,11 +118,11 @@ export default function SettingsPage({
                 <input
                   type="checkbox"
                   defaultChecked={settings.showConfetti}
+                  checked={settings.showConfetti}
                   onClick={(e) => {
                     spawnConfetti(e.pageX, e.pageY);
                   }}
                   onChange={(e) => {
-                    console.log(settings.showConfetti);
                     setSetting("showConfetti", e.currentTarget.checked);
                   }}
                 />
@@ -119,22 +130,28 @@ export default function SettingsPage({
             </tr>
           </tbody>
         </table>
-        <Words type="heading">Tips</Words>
-        <Row style={{ margin: "10px" }}>
-          <input
-            type="checkbox"
-            defaultChecked={settings.enableTips}
-            onChange={(e) => {
-              setSetting("enableTips", e.currentTarget.checked);
-            }}
-          />
-          <label>Show a random tip everyday</label>
+        {/* Mood Logger Settings */}
+        <Row>
+          <Words style={{ flexShrink: "0" }} type="heading">
+            Mood Tracker
+          </Words>
+          <Row util={["align-center", "small-gap"]}>
+            <input
+              type="checkbox"
+              defaultChecked={settings.syncMoodLogger}
+              checked={settings.syncMoodLogger}
+              onChange={(e) => {
+                setSetting("syncMoodLogger", e.currentTarget.checked);
+              }}
+            />
+            <label>Sync?</label>
+          </Row>
         </Row>
-        <Words type="heading">Mood Tracker</Words>
         <Row style={{ margin: "10px" }}>
           <input
             type="checkbox"
             defaultChecked={settings.showMood}
+            checked={settings.showMood}
             onChange={(e) => {
               setSetting("showMood", e.currentTarget.checked);
             }}
@@ -145,6 +162,7 @@ export default function SettingsPage({
           <input
             type="checkbox"
             defaultChecked={settings.promptMood}
+            checked={settings.promptMood}
             onChange={(e) => {
               setSetting("promptMood", e.currentTarget.checked);
             }}
@@ -155,6 +173,7 @@ export default function SettingsPage({
           <input
             type="checkbox"
             defaultChecked={settings.useMoodColors}
+            checked={settings.useMoodColors}
             onChange={(e) => {
               setSetting("useMoodColors", e.currentTarget.checked);
             }}
@@ -163,30 +182,42 @@ export default function SettingsPage({
         </Row>
         <label>Select moods to show on prompt:</label>
         <br />
-        {moodList.map((x) => (
-          <GoogleMatieralIcon
-            util={[
-              "clickable",
-              "lift-up",
-              "round",
-              settings.userMoods.includes(x) ? "selected" : "giraffe",
-            ]}
-            size="48px"
-            outline={true}
-            style={combineStyles(
-              {
-                padding: "5px",
-              },
-              settings.useMoodColors ? { color: moodColorMap[moodMap[x]] } : {}
-            )}
-            name={`sentiment_${x}`}
-            onClick={() => toggle(x)}
+        <Row util={["small-gap"]} style={{ padding: "5px" }}>
+          {moodList.map((x) => (
+            <GoogleMatieralIcon
+              util={[
+                "clickable",
+                "lift-up",
+                "round",
+                settings.userMoods.includes(x) ? "selected" : "giraffe",
+              ]}
+              size="48px"
+              outline={true}
+              style={combineStyles(
+                {
+                  padding: "5px",
+                },
+                settings.useMoodColors
+                  ? { color: moodColorMap[moodMap[x]] }
+                  : {}
+              )}
+              name={`sentiment_${x}`}
+              onClick={() => toggle(x)}
+            />
+          ))}
+        </Row>
+        <Words type="heading">Miscellaneous</Words>
+        <Row style={{ margin: "10px" }}>
+          <input
+            type="checkbox"
+            defaultChecked={settings.enableTips}
+            checked={settings.enableTips}
+            onChange={(e) => {
+              setSetting("enableTips", e.currentTarget.checked);
+            }}
           />
-        ))}
-        <Words type="heading" style={{ display: "block" }}>
-          Shortcuts
-        </Words>
-        <ShortcutList />
+          <label>Show a random tip everyday</label>
+        </Row>
       </Container>
     </Column>
   );

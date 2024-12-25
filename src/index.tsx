@@ -14,8 +14,8 @@ import { SettingsDataProvider } from "./App/hooks/useSettings";
 
 let t = localStorage.getItem("kairo-theme");
 if (t) setTheme(t as any);
-if (localStorage.getItem("kairo-background-url"))
-  themeSetBackground(localStorage.getItem("kairo-background-url") as string);
+if (localStorage.getItem("kairo-backgroundImage"))
+  themeSetBackground(localStorage.getItem("kairo-backgroundImage") as string);
 loadTheme();
 
 const root = ReactDOM.createRoot(

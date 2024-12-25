@@ -1,3 +1,8 @@
+export interface User {
+  id: number;
+  settings: string;
+}
+
 export interface Task {
   id: number;
   user: number;

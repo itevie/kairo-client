@@ -1,6 +1,6 @@
 import { AxiosWrapper } from "../dawn-ui/util";
 import { apiUrl } from "../Pages/Login";
-import { Group, MoodLog, Task } from "./types";
+import { Group, MoodLog, Task, User } from "./types";
 
 const axiosClient = new AxiosWrapper();
 axiosClient.showLoader = false;
@@ -8,6 +8,23 @@ axiosClient.config.withCredentials = true;
 axiosClient.config.headers = {
   Authorization: "Bearer Guest",
 };
+
+// ----- Users -----
+export async function fetchUser() {
+  return await axiosClient.wrapper<"get", User>(
+    "get",
+    `${apiUrl}/api/user_data`,
+    undefined
+  );
+}
+
+export async function updateSettings(value: string) {
+  return await axiosClient.wrapper<"patch", void>(
+    "patch",
+    `${apiUrl}/api/update_settings`,
+    { settings: value }
+  );
+}
 
 // ----- Tasks -----
 
