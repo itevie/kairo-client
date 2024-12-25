@@ -120,6 +120,12 @@ export default function TaskList({
               data: data[x],
               query,
               keyCheck: ["title", "note"],
+              custom: [
+                [
+                  /@([a-z]+)/,
+                  (d, v) => d.tags?.split(";").includes(v) ?? false,
+                ],
+              ],
             }).length > 0
         )
         .map((k) => (

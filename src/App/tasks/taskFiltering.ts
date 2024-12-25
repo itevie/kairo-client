@@ -1,3 +1,4 @@
+import { SearchOptions } from "../../dawn-ui/seacher";
 import { DawnTime, units } from "../../dawn-ui/time";
 import { Group, Task } from "../types";
 import { ListType } from "./TaskList";

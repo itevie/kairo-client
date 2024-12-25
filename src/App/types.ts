@@ -8,6 +8,7 @@ export interface Task {
   repeat: number | null;
   in_group: number | null;
   note: string | null;
+  tags: string | null;
 }
 
 export interface Group {

@@ -12,10 +12,9 @@ export default async function showTaskEditor(
   isEdit?: boolean
 ): Promise<Partial<Task> | null> {
   return new Promise<Partial<Task> | null>((resolve) => {
+    // Load the stuff & the defaults
     let title = preset?.title ?? "";
-    let due = preset?.due
-      ? preset.due.replace(/\//g, "-").replace(" ", "T")
-      : "";
+    let due = preset?.due?.replace(/\//g, "-").replace(" ", "T") ?? "";
     let repeat = preset?.repeat
       ? new DawnTime(preset?.repeat).toString(["ms"])
       : "";
@@ -23,6 +22,7 @@ export default async function showTaskEditor(
       ? groups.find((x) => x.id === preset.in_group)?.name ?? ""
       : "";
     let note = preset?.note ?? "";
+    let tags = preset?.tags ?? "";
 
     if (page.startsWith("group-") && !preset) {
       let id = page.split("-")[1];
@@ -93,6 +93,20 @@ export default async function showTaskEditor(
                 </select>
               </td>
             </tr>
+
+            <tr>
+              <td>
+                <label>Tags</label>
+              </td>
+              <td>
+                <input
+                  defaultValue={tags}
+                  onChange={(e) => (tags = e.currentTarget.value)}
+                  style={{ width: "100%" }}
+                  className="dawn-big"
+                />
+              </td>
+            </tr>
             <tr>
               <td>
                 <label>Note</label>
@@ -140,6 +154,7 @@ export default async function showTaskEditor(
               title: title,
               due: due || null,
               note: note,
+              tags: tags || null,
             });
           },
         },

@@ -45,6 +45,7 @@ export default function TaskGroup({
     query: query,
     data: data[group],
     keyCheck: ["note", "title"],
+    custom: [[/@([a-z]+)/, (d, v) => d.tags?.split(";").includes(v) ?? false]],
   });
 
   return (
