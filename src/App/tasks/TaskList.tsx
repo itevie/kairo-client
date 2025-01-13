@@ -16,6 +16,7 @@ export type ListType =
   | "all"
   | "finished"
   | "repeating"
+  | "tagged"
   | `group-${number}`;
 
 const filters: { [key: string]: (task: Task) => boolean } = {
@@ -23,6 +24,7 @@ const filters: { [key: string]: (task: Task) => boolean } = {
   due: (t: Task) => t.due !== null && !t.finished,
   finished: (t: Task) => t.finished,
   repeating: (t: Task) => !t.finished && t.repeat !== null,
+  tagged: (t: Task) => !!t.tags && t.tags?.length > 0,
 } as const;
 
 export default function TaskList({
@@ -50,6 +52,8 @@ export default function TaskList({
     .sort(
       (a, b) => new Date(b.due || 0).getTime() - new Date(a.due || 0).getTime()
     );
+
+  console.log(tasks);
 
   setShortcutCallback("search", () => {
     inputRef.current?.focus();

@@ -42,6 +42,37 @@ export default function showTaskContextMenu({
         },
       },
       {
+        label: "Move To...",
+        type: "button",
+        onClick: (ev, r) => {
+          r({
+            event: ev,
+            elements: [
+              {
+                label: "No Group",
+                type: "button",
+                onClick: async () => {
+                  await hook.updateTask(task.id, {
+                    in_group: null,
+                  });
+                },
+              },
+              ...hook.groups.map((x) => {
+                return {
+                  label: x.name,
+                  type: "button",
+                  onClick: async () => {
+                    await hook.updateTask(task.id, {
+                      in_group: x.id,
+                    });
+                  },
+                } as const;
+              }),
+            ],
+          });
+        },
+      },
+      {
         type: "seperator",
       },
       {

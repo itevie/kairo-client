@@ -71,7 +71,6 @@ export default function Kairo() {
         addAlert({
           title: "Daily Tip",
           body: <label>{tips[Math.floor(Math.random() * tips.length)]}</label>,
-          allowOutsideClose: true,
           buttons: [
             {
               id: "disable",
@@ -132,6 +131,7 @@ export default function Kairo() {
           {[
             ["Due", "due", "schedule"],
             ["All", "all", "list"],
+            ["Tagged", "tagged", "sell"],
             ["Reapting", "repeating", "replay"],
             ["Finished", "finished", "task_alt"],
           ].map((x) => (

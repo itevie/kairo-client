@@ -1,12 +1,16 @@
 import { useRef, useState } from "react";
-import { addAlert, closeAlert } from "../dawn-ui/components/AlertManager";
+import {
+  addAlert,
+  closeAlert,
+  showErrorAlert,
+} from "../dawn-ui/components/AlertManager";
 import Button from "../dawn-ui/components/Button";
 import Column from "../dawn-ui/components/Column";
 import GoogleMatieralIcon from "../dawn-ui/components/GoogleMaterialIcon";
 import Row from "../dawn-ui/components/Row";
 import { combineStyles } from "../dawn-ui/util";
-import { createMoodEntry } from "./api";
 import useSettings from "./hooks/useSettings";
+import api from "./api";
 
 export type MoodType = "very_bad" | "bad" | "neutral" | "good" | "very_good";
 export const moodTypes = [
@@ -121,9 +125,9 @@ function MoodLoggerElement() {
         <Button
           big
           onClick={async () => {
-            if (!selected) return;
+            if (!selected) return showErrorAlert("Please provide a mood!");
             try {
-              await createMoodEntry({
+              await api.addMoodEntry({
                 emotion: selected,
                 note: noteRef.current?.value,
               });

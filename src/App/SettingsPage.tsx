@@ -7,9 +7,11 @@ import Words from "../dawn-ui/components/Words";
 import useMainHook from "./hooks/useMainHook";
 import { moodColorMap, moodList, moodMap } from "./MoodLogger";
 import GoogleMatieralIcon from "../dawn-ui/components/GoogleMaterialIcon";
-import { combineStyles } from "../dawn-ui/util";
+import { combineStyles, randomRange } from "../dawn-ui/util";
 import { spawnConfetti } from "../dawn-ui/confetti";
 import useSettings from "./hooks/useSettings";
+import ProgressBar from "../dawn-ui/components/ProgressBar";
+import { useEffect, useState } from "react";
 
 export default function SettingsPage({
   hook,

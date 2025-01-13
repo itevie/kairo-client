@@ -1,4 +1,3 @@
-import { SearchOptions } from "../../dawn-ui/seacher";
 import { DawnTime, units } from "../../dawn-ui/time";
 import { Group, Task } from "../types";
 import { ListType } from "./TaskList";
@@ -62,6 +61,14 @@ export function groupTasks(
           if (!data[name]) data[name] = [];
           data[name].push(task);
         }
+      break;
+    case "tagged":
+      for (const task of tasks) {
+        for (const tag of task.tags?.split(";") || []) {
+          if (!data[tag]) data[tag] = [];
+          data[tag].push(task);
+        }
+      }
       break;
     case "repeating":
       tasks = tasks.sort((a, b) => (a.repeat as number) - (b.repeat as number));

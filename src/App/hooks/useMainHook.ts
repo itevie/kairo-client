@@ -1,18 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-  addGroup,
-  addTask,
-  createMoodEntry,
-  deleteTask,
-  fetchGroups,
-  fetchMoodEntries,
-  fetchTasks,
-  updateGroup,
-  updateTask,
-} from "../api";
 import { Group, MoodLog, Task } from "../types";
 import { DawnTime } from "../../dawn-ui/time";
 import showMoodLogger from "../MoodLogger";
+import api from "../api";
 
 export type TaskHookType = ReturnType<typeof useMainHook>;
 
@@ -36,7 +26,7 @@ export default function useMainHook() {
 
   async function reloadTasks() {
     try {
-      const response = await fetchTasks();
+      const response = await api.fetchTasks();
       localStorage.setItem("kairo_task_cache", JSON.stringify(response.data));
       setTasks(response.data);
     } catch {}
@@ -44,7 +34,7 @@ export default function useMainHook() {
 
   async function createTask(data: Partial<Task>) {
     try {
-      await addTask(data);
+      await api.addTask(data);
       reloadTasks();
     } catch {}
   }
@@ -53,7 +43,7 @@ export default function useMainHook() {
     try {
       const task = tasks.find((x) => x.id === id);
       if (task) {
-        const updatedTask = await updateTask(id, data);
+        const updatedTask = await api.updateTask(id, data);
         setTasks((prev) =>
           prev.map((t) => (t.id === id ? updatedTask.data : t))
         );
@@ -63,7 +53,7 @@ export default function useMainHook() {
 
   async function _deleteTask(id: number) {
     try {
-      await deleteTask(id);
+      await api.deleteTask(id);
       reloadTasks();
     } catch {}
   }
@@ -72,7 +62,7 @@ export default function useMainHook() {
 
   async function reloadGroups() {
     try {
-      const response = await fetchGroups();
+      const response = await api.fetchGroups();
       localStorage.setItem("kairo_group_cache", JSON.stringify(response.data));
       setGroups(response.data);
     } catch {}
@@ -80,7 +70,7 @@ export default function useMainHook() {
 
   async function createGroup(name: string) {
     try {
-      let n = await addGroup(name);
+      let n = await api.addGroup(name);
       setGroups((old) => {
         return [...old, n.data];
       });
@@ -93,7 +83,7 @@ export default function useMainHook() {
 
   async function _updateGroup(id: number, data: Partial<Group>) {
     try {
-      await updateGroup(id, data);
+      await api.updateGroup(id, data);
       reloadGroups();
     } catch {}
   }
@@ -101,13 +91,13 @@ export default function useMainHook() {
   // ----- Moods -----
   async function _createMoodEntry(entry: Partial<MoodLog>) {
     try {
-      await createMoodEntry(entry);
+      await api.addMoodEntry(entry);
     } catch {}
   }
 
   async function _fetchMoodEntries() {
     try {
-      const result = await fetchMoodEntries();
+      const result = await api.fetchMoodEntries();
       setMoods(result.data);
 
       if (

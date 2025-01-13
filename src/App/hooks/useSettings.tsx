@@ -6,8 +6,8 @@ import {
   useState,
 } from "react";
 import { showErrorAlert } from "../../dawn-ui/components/AlertManager";
-import { fetchUser, updateSettings } from "../api";
 import { setTheme, themeSetBackground } from "../../dawn-ui";
+import api from "../api";
 
 interface KairoSettings {
   useTransparency: boolean;
@@ -90,7 +90,7 @@ export function SettingsDataProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     (async () => {
-      const x = await fetchUser();
+      const x = await api.fetchUser();
       setSettings((old) => {
         const result = JSON.parse(x.data.settings);
         const set: Partial<KairoSettings> = {};
@@ -143,7 +143,7 @@ export function SettingsDataProvider({ children }: { children: ReactNode }) {
     (async () => {
       const toSync = constructSync();
       toSync[key] = value;
-      await updateSettings(JSON.stringify(toSync));
+      await api.updateUserSettings(JSON.stringify(toSync));
     })();
   }
 
