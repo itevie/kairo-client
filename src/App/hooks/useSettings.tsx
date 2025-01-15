@@ -5,7 +5,10 @@ import {
   useEffect,
   useState,
 } from "react";
-import { showErrorAlert } from "../../dawn-ui/components/AlertManager";
+import {
+  addAlert,
+  showErrorAlert,
+} from "../../dawn-ui/components/AlertManager";
 import { setTheme, themeSetBackground } from "../../dawn-ui";
 import api from "../api";
 
@@ -90,28 +93,55 @@ export function SettingsDataProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     (async () => {
-      const x = await api.fetchUser();
-      setSettings((old) => {
-        const result = JSON.parse(x.data.settings);
-        const set: Partial<KairoSettings> = {};
+      if (window.location.pathname === "/login") return;
+      try {
+        const x = await api.fetchUser();
+        setSettings((old) => {
+          const result = JSON.parse(x.data.settings);
+          const set: Partial<KairoSettings> = {};
 
-        if (result.syncAppearance)
-          for (const key of appearanceKeys)
-            if (key in result) {
-              if (result[key] !== settings[key]) {
-                localStorage.setItem(`kairo-${key}`, result[key]);
-                if (key === "backgroundImage") themeSetBackground(result[key]);
-                if (key === "theme") setTheme(result[key]);
+          if (result.syncAppearance)
+            for (const key of appearanceKeys)
+              if (key in result) {
+                if (result[key] !== settings[key]) {
+                  localStorage.setItem(`kairo-${key}`, result[key]);
+                  if (key === "backgroundImage")
+                    themeSetBackground(result[key]);
+                  if (key === "theme") setTheme(result[key]);
+                }
+                set[key] = result[key];
               }
-              set[key] = result[key];
-            }
 
-        if (result.syncMoodLogger)
-          for (const key of moodLoggerKeys)
-            if (key in result) set[key] = result[key];
+          if (result.syncMoodLogger)
+            for (const key of moodLoggerKeys)
+              if (key in result) set[key] = result[key];
 
-        return { ...old, ...set };
-      });
+          return { ...old, ...set };
+        });
+      } catch (e) {
+        console.log(e);
+        addAlert({
+          title: "Are you logged in?",
+          body: "Kairo failed to load your user settings, you might need to log in.",
+          buttons: [
+            {
+              id: "ignore",
+              text: "Ignore",
+              click(close) {
+                close();
+              },
+            },
+            {
+              id: "login",
+              text: "Login",
+              click(close) {
+                close();
+                window.location.href = "/login";
+              },
+            },
+          ],
+        });
+      }
     })();
   }, []);
 

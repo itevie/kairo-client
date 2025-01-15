@@ -3,6 +3,9 @@ import { Group, MoodLog, Task, User } from "../types";
 import ApiManagerBase from "./ApiManagerBase";
 
 export default class ServerApiManager extends ApiManagerBase {
+  public name: string = "Server";
+  public description: string = "Stores your tasks on kairo.dawn.rest";
+
   //#region User Calls
   async fetchUser(): Promise<AxiosResponse<User>> {
     return await this.axiosClient.get<User>(`/api/user_data`);

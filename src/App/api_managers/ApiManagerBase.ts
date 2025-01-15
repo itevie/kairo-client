@@ -3,6 +3,9 @@ import { AxiosWrapper } from "../../dawn-ui/util";
 import { Group, MoodLog, Task, User } from "../types";
 
 export default abstract class ApiManagerBase {
+  public abstract name: string;
+  public abstract description: string;
+
   protected axiosClient: AxiosWrapper;
 
   constructor(axiosClient: AxiosWrapper) {

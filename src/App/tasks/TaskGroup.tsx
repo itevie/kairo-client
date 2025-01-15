@@ -11,6 +11,8 @@ import showTaskContextMenu from "./taskContext";
 import { ListType } from "./TaskList";
 import GoogleMatieralIcon from "../../dawn-ui/components/GoogleMaterialIcon";
 import { getSearchResults } from "../../dawn-ui/seacher";
+import { getTagsFromTagString } from "../util";
+import Flyout from "../../dawn-ui/components/Flyout";
 
 const collapseCache: { [key: string]: boolean } = {};
 
@@ -111,7 +113,7 @@ export default function TaskGroup({
                 checked={x.finished}
                 type="checkbox"
               />
-              <Column>
+              <Column util={["small-gap"]}>
                 <label>{x.title}</label>
                 {x.note ? (
                   <label style={{ fontSize: "0.8em" }}>{x.note}</label>
@@ -120,10 +122,46 @@ export default function TaskGroup({
                 )}
                 {(x.due || x.repeat) && (
                   <small>
-                    {x.due ? `Due: ${x.due} ` : ""}
-                    {x.repeat
-                      ? `Repeat: ${new DawnTime(x.repeat || 0).toString()}`
-                      : ""}
+                    <Row>
+                      {(
+                        [
+                          x.due
+                            ? ["schedule", `${x.due}`, `Due on ${x.due}`]
+                            : null,
+                          x.repeat
+                            ? [
+                                "repeat",
+                                new DawnTime(x.repeat || 0).toString(),
+                                `Repeats every ${new DawnTime(
+                                  x.repeat || 0
+                                ).toString()}`,
+                              ]
+                            : null,
+                          x.tags
+                            ? [
+                                "sell",
+                                getTagsFromTagString(x.tags).join(", "),
+                                `Tags: ${getTagsFromTagString(x.tags).join(
+                                  ", "
+                                )}`,
+                              ]
+                            : null,
+                        ].filter((x) => x !== null) as [
+                          string,
+                          string,
+                          string
+                        ][]
+                      ).map((x) => (
+                        <Flyout text={x[2] || ""} timeout={250}>
+                          <Row
+                            util={["small-gap", "align-center", "fit-content"]}
+                          >
+                            <GoogleMatieralIcon name={x[0]} />
+                            <label>{x[1]}</label>
+                          </Row>
+                        </Flyout>
+                      ))}
+                    </Row>
                   </small>
                 )}
               </Column>
