@@ -10,11 +10,12 @@ import Welcome from "./Pages/Welcome";
 import Login from "./Pages/Login";
 import Kairo from "./App/Kairo";
 import { FlyoutManager } from "./dawn-ui/components/Flyout";
+import { SettingsDataProvider } from "./App/hooks/useSettings";
 
 let t = localStorage.getItem("kairo-theme");
 if (t) setTheme(t as any);
-if (localStorage.getItem("kairo-background-url"))
-  themeSetBackground(localStorage.getItem("kairo-background-url") as string);
+if (localStorage.getItem("kairo-backgroundImage"))
+  themeSetBackground(localStorage.getItem("kairo-backgroundImage") as string);
 loadTheme();
 
 const root = ReactDOM.createRoot(
@@ -45,10 +46,10 @@ const router = createBrowserRouter([
 ]);
 
 root.render(
-  <>
+  <SettingsDataProvider>
     <AlertManager />
     <FlyoutManager />
     <ContextMenuManager />
     <RouterProvider router={router} />
-  </>
+  </SettingsDataProvider>
 );

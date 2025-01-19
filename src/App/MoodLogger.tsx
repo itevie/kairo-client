@@ -1,11 +1,16 @@
 import { useRef, useState } from "react";
-import { addAlert, closeAlert } from "../dawn-ui/components/AlertManager";
+import {
+  addAlert,
+  closeAlert,
+  showErrorAlert,
+} from "../dawn-ui/components/AlertManager";
 import Button from "../dawn-ui/components/Button";
 import Column from "../dawn-ui/components/Column";
 import GoogleMatieralIcon from "../dawn-ui/components/GoogleMaterialIcon";
 import Row from "../dawn-ui/components/Row";
 import { combineStyles } from "../dawn-ui/util";
-import { createMoodEntry } from "./api";
+import useSettings from "./hooks/useSettings";
+import api from "./api";
 
 export type MoodType = "very_bad" | "bad" | "neutral" | "good" | "very_good";
 export const moodTypes = [
@@ -72,12 +77,9 @@ export function createAverageMood(values: MoodType[]): MoodType {
 }
 
 function MoodLoggerElement() {
+  const settings = useSettings();
   const [selected, setSelected] = useState<string | null>(null);
   const noteRef = useRef<HTMLTextAreaElement>(null);
-  const data = localStorage.getItem("kairo-user-moods");
-  const userMoods = !data ? defaultMoodList : JSON.parse(data);
-  const useColors =
-    (localStorage.getItem("kairo-use-mood-colors") ?? "true") === "true";
 
   return (
     <Column>
@@ -87,7 +89,7 @@ function MoodLoggerElement() {
         style={{ position: "relative", gap: "3px" }}
       >
         {moodList
-          .filter((x) => userMoods.includes(x))
+          .filter((x) => settings.settings.userMoods.includes(x))
           .map((x) => (
             <GoogleMatieralIcon
               util={[
@@ -100,7 +102,9 @@ function MoodLoggerElement() {
                 {
                   padding: "5px",
                 },
-                useColors ? { color: moodColorMap[moodMap[x]] } : {}
+                settings.settings.useMoodColors
+                  ? { color: moodColorMap[moodMap[x]] }
+                  : {}
               )}
               size="48px"
               outline={true}
@@ -121,9 +125,9 @@ function MoodLoggerElement() {
         <Button
           big
           onClick={async () => {
-            if (!selected) return;
+            if (!selected) return showErrorAlert("Please provide a mood!");
             try {
-              await createMoodEntry({
+              await api.addMoodEntry({
                 emotion: selected,
                 note: noteRef.current?.value,
               });

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import {
   addAlert,
-  closeAlert,
   showInputAlert,
 } from "../dawn-ui/components/AlertManager";
 import Column from "../dawn-ui/components/Column";
@@ -10,12 +9,12 @@ import FAB from "../dawn-ui/components/FAB";
 import Row from "../dawn-ui/components/Row";
 import Sidebar from "../dawn-ui/components/Sidebar";
 import SidebarButton from "../dawn-ui/components/SidebarButton";
-import TaskList, { ListType } from "./TaskList";
-import useTasks from "./hooks/useTasks";
-import showTaskEditor from "./TaskEditor";
+import TaskList, { ListType } from "./tasks/TaskList";
+import useMainHook from "./hooks/useMainHook";
+import showTaskEditor from "./tasks/TaskEditor";
 import {
   registerShortcut,
-  setCallback,
+  setShortcutCallback,
 } from "../dawn-ui/components/ShortcutManager";
 import showMoodLogger from "./MoodLogger";
 import SettingsPage from "./SettingsPage";
@@ -23,11 +22,10 @@ import "react-calendar/dist/Calendar.css";
 import { DawnTime } from "../dawn-ui/time";
 import "./style.css";
 import { showContextMenu } from "../dawn-ui/components/ContextMenuManager";
-import Button from "../dawn-ui/components/Button";
-import Flyout from "../dawn-ui/components/Flyout";
 import tips from "./tips";
 import MoodHistoryForDate from "./MoodHistoryForDate";
 import MoodHistory from "./MoodHistory";
+import { showGroupEditor } from "./GroupEditor";
 
 registerShortcut("search", { key: "s", modifiers: ["ctrl"] });
 registerShortcut("new-task", { key: "n", modifiers: ["shift"] });
@@ -41,7 +39,7 @@ registerShortcut("log-mood", {
 });
 
 export default function Kairo() {
-  const tasks = useTasks();
+  const tasks = useMainHook();
   const [page, _setPage] = useState<string>("all");
 
   useEffect(() => {
@@ -55,7 +53,7 @@ export default function Kairo() {
       setPage(window.location.hash.replace("#", ""));
     });
 
-    setCallback("settings", () => {
+    setShortcutCallback("settings", () => {
       setPage("settings");
     });
 
@@ -71,7 +69,6 @@ export default function Kairo() {
         addAlert({
           title: "Daily Tip",
           body: <label>{tips[Math.floor(Math.random() * tips.length)]}</label>,
-          allowOutsideClose: true,
           buttons: [
             {
               id: "disable",
@@ -106,10 +103,14 @@ export default function Kairo() {
   }
 
   return (
-    <Row className="full-page" style={{ position: "relative" }}>
+    <Row
+      className="full-page"
+      util={["no-gap"]}
+      style={{ position: "relative" }}
+    >
       <FAB shortcut={"new-task"} clicked={handleCreateTask} />
       <Sidebar>
-        <Column style={{ gap: "5px" }}>
+        <Column util={["no-select"]} style={{ gap: "5px" }}>
           {(localStorage.getItem("kairo-show-mood") ?? "true") === "true" && (
             <>
               <SidebarButton
@@ -128,6 +129,7 @@ export default function Kairo() {
           {[
             ["Due", "due", "schedule"],
             ["All", "all", "list"],
+            ["Tagged", "tagged", "sell"],
             ["Reapting", "repeating", "replay"],
             ["Finished", "finished", "task_alt"],
           ].map((x) => (
@@ -155,72 +157,7 @@ export default function Kairo() {
                       type: "button",
                       label: "Edit",
                       onClick: () => {
-                        let color: string | null = x.theme;
-                        let name: string = x.name;
-                        addAlert({
-                          title: `Edit Group ${x.name}`,
-                          body: (
-                            <Column>
-                              <table>
-                                <tbody>
-                                  <tr>
-                                    <td>Name</td>
-                                    <td>
-                                      <input
-                                        defaultValue={name}
-                                        onChange={(e) =>
-                                          (name = e.currentTarget.value)
-                                        }
-                                        className="dawn-big"
-                                      />
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>Color</td>
-                                    <td>
-                                      <Row util={["no-gap"]}>
-                                        <input
-                                          defaultValue={color ?? "#FFFFFF"}
-                                          onChange={(e) =>
-                                            (color = e.currentTarget.value)
-                                          }
-                                          className="dawn-big"
-                                          type="color"
-                                        />
-                                        <Flyout text="Color will be removed when you click Save">
-                                          <Button
-                                            big
-                                            style={{ margin: "0px" }}
-                                            onClick={() => (color = null)}
-                                          >
-                                            Remove Color
-                                          </Button>
-                                        </Flyout>
-                                      </Row>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                              <Row>
-                                <Button big onClick={() => closeAlert()}>
-                                  Close
-                                </Button>
-                                <Button
-                                  big
-                                  onClick={() => {
-                                    tasks.updateGroup(x.id, {
-                                      name,
-                                      theme: color,
-                                    });
-                                    closeAlert();
-                                  }}
-                                >
-                                  Save
-                                </Button>
-                              </Row>
-                            </Column>
-                          ),
-                        });
+                        showGroupEditor(x, tasks);
                       },
                     },
                   ],
@@ -244,7 +181,14 @@ export default function Kairo() {
           />
         </Column>
       </Sidebar>
-      <Content style={{ width: "100%", overflow: "auto" }}>
+      <Content
+        style={{
+          width: "100%",
+          overflow: "auto",
+          margin: "0px",
+          padding: "20px",
+        }}
+      >
         {page.startsWith("view_mood_details") ? (
           <MoodHistoryForDate date={page.split("@")[1]} hook={tasks} />
         ) : (

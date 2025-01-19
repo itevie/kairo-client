@@ -1,48 +1,54 @@
-import { useState } from "react";
 import { setTheme, themeSetBackground } from "../dawn-ui";
 import Column from "../dawn-ui/components/Column";
 import Container from "../dawn-ui/components/Container";
 import Row from "../dawn-ui/components/Row";
-import { ShortcutList } from "../dawn-ui/components/ShortcutManager";
 import Words from "../dawn-ui/components/Words";
-import useTasks from "./hooks/useTasks";
-import { defaultMoodList, moodColorMap, moodList, moodMap } from "./MoodLogger";
+import useMainHook from "./hooks/useMainHook";
+import { moodColorMap, moodList, moodMap } from "./MoodLogger";
 import GoogleMatieralIcon from "../dawn-ui/components/GoogleMaterialIcon";
 import { combineStyles } from "../dawn-ui/util";
 import { spawnConfetti } from "../dawn-ui/confetti";
+import useSettings from "./hooks/useSettings";
 
 export default function SettingsPage({
   hook,
 }: {
-  hook: ReturnType<typeof useTasks>;
+  hook: ReturnType<typeof useMainHook>;
 }) {
-  let data = localStorage.getItem("kairo-user-moods");
-  const [userMoods, setUserMoods] = useState<string[]>(
-    !data
-      ? (defaultMoodList as any as string[])
-      : (JSON.parse(data) as any as string[])
-  );
-  const useColors =
-    (localStorage.getItem("kairo-use-mood-colors") ?? "true") === "true";
+  const { settings, setSetting } = useSettings();
 
   function toggle(type: string) {
-    setUserMoods((old) => {
-      if (old.includes(type)) {
-        old.splice(old.indexOf(type), 1);
-      } else {
-        old.push(type);
-      }
+    let old = settings.userMoods;
 
-      localStorage.setItem("kairo-user-moods", JSON.stringify(old));
-      return [...old];
-    });
+    if (old.includes(type)) {
+      old.splice(old.indexOf(type), 1);
+    } else {
+      old.push(type);
+    }
+
+    setSetting("userMoods", [...old]);
   }
 
   return (
     <Column util={["no-gap"]}>
       <Words type="page-title">Settings</Words>
       <Container>
-        <Words type="heading">Appearance</Words>
+        {/* Appearance Settings */}
+        <Row>
+          <Words type="heading">Appearance</Words>
+          <Row util={["align-center", "small-gap"]}>
+            <input
+              type="checkbox"
+              defaultChecked={settings.syncAppearance}
+              checked={settings.syncAppearance}
+              onChange={(e) => {
+                console.log(settings.syncAppearance);
+                setSetting("syncAppearance", e.currentTarget.checked);
+              }}
+            />
+            <label>Sync?</label>
+          </Row>
+        </Row>
         <table style={{ borderSpacing: "10px" }}>
           <tbody>
             <tr>
@@ -51,14 +57,9 @@ export default function SettingsPage({
               </td>
               <td>
                 <select
-                  defaultValue={
-                    localStorage.getItem("kairo-default-page") ?? "all"
-                  }
+                  defaultValue={settings.defaultPage}
                   onChange={(e) => {
-                    localStorage.setItem(
-                      "kairo-default-page",
-                      e.currentTarget.value
-                    );
+                    setSetting("defaultPage", e.currentTarget.value);
                   }}
                 >
                   <option value="due">Due</option>
@@ -74,15 +75,16 @@ export default function SettingsPage({
                 </select>
               </td>
             </tr>
+
             <tr>
               <td>
                 <label>Theme</label>
               </td>
               <td>
                 <select
-                  defaultValue={localStorage.getItem("kairo-theme") || "dark"}
+                  defaultValue={settings.theme}
                   onChange={(e) => {
-                    localStorage.setItem("kairo-theme", e.currentTarget.value);
+                    setSetting("theme", e.currentTarget.value);
                     setTheme(e.currentTarget.value as any);
                   }}
                 >
@@ -99,14 +101,9 @@ export default function SettingsPage({
               </td>
               <td>
                 <input
-                  defaultValue={
-                    localStorage.getItem("kairo-background-url") || ""
-                  }
+                  defaultValue={settings.backgroundImage}
                   onChange={(e) => {
-                    localStorage.setItem(
-                      "kairo-background-url",
-                      e.currentTarget.value
-                    );
+                    setSetting("backgroundImage", e.currentTarget.value);
                     themeSetBackground(e.currentTarget.value);
                   }}
                 />
@@ -119,52 +116,43 @@ export default function SettingsPage({
               <tr>
                 <input
                   type="checkbox"
-                  defaultValue={
-                    localStorage.getItem("kairo-show-confetii") ?? "true"
-                  }
+                  defaultChecked={settings.showConfetti}
+                  checked={settings.showConfetti}
                   onClick={(e) => {
                     spawnConfetti(e.pageX, e.pageY);
                   }}
                   onChange={(e) => {
-                    localStorage.setItem(
-                      "kairo-show-confetti",
-                      e.currentTarget.checked.toString()
-                    );
+                    setSetting("showConfetti", e.currentTarget.checked);
                   }}
                 />
               </tr>
             </tr>
           </tbody>
         </table>
-        <Words type="heading">Tips</Words>
-        <Row style={{ margin: "10px" }}>
-          <input
-            type="checkbox"
-            defaultChecked={
-              (localStorage.getItem("kairo-enable-tips") ?? "true") === "true"
-            }
-            onChange={(e) => {
-              localStorage.setItem(
-                "kairo-enable-tips",
-                e.currentTarget.checked.toString()
-              );
-            }}
-          />
-          <label>Show a random tip everyday</label>
+        {/* Mood Logger Settings */}
+        <Row>
+          <Words style={{ flexShrink: "0" }} type="heading">
+            Mood Tracker
+          </Words>
+          <Row util={["align-center", "small-gap"]}>
+            <input
+              type="checkbox"
+              defaultChecked={settings.syncMoodLogger}
+              checked={settings.syncMoodLogger}
+              onChange={(e) => {
+                setSetting("syncMoodLogger", e.currentTarget.checked);
+              }}
+            />
+            <label>Sync?</label>
+          </Row>
         </Row>
-        <Words type="heading">Mood Tracker</Words>
         <Row style={{ margin: "10px" }}>
           <input
             type="checkbox"
-            defaultChecked={
-              (localStorage.getItem("kairo-show-mood") ?? "true") === "true"
-            }
+            defaultChecked={settings.showMood}
+            checked={settings.showMood}
             onChange={(e) => {
-              localStorage.setItem(
-                "kairo-show-mood",
-                e.currentTarget.checked.toString()
-              );
-              window.location.reload();
+              setSetting("showMood", e.currentTarget.checked);
             }}
           />
           <label>Show mood tracking section</label>
@@ -172,15 +160,10 @@ export default function SettingsPage({
         <Row style={{ margin: "10px" }}>
           <input
             type="checkbox"
-            defaultChecked={
-              (localStorage.getItem("kairo-prompt-mood") ?? "true") === "true"
-            }
+            defaultChecked={settings.promptMood}
+            checked={settings.promptMood}
             onChange={(e) => {
-              localStorage.setItem(
-                "kairo-prompt-mood",
-                e.currentTarget.checked.toString()
-              );
-              window.location.reload();
+              setSetting("promptMood", e.currentTarget.checked);
             }}
           />
           <label>Prompt to log mood every day</label>
@@ -188,46 +171,52 @@ export default function SettingsPage({
         <Row style={{ margin: "10px" }}>
           <input
             type="checkbox"
-            defaultChecked={
-              (localStorage.getItem("kairo-use-mood-colors") ?? "true") ===
-              "true"
-            }
+            defaultChecked={settings.useMoodColors}
+            checked={settings.useMoodColors}
             onChange={(e) => {
-              localStorage.setItem(
-                "kairo-use-mood-colors",
-                e.currentTarget.checked.toString()
-              );
-              window.location.reload();
+              setSetting("useMoodColors", e.currentTarget.checked);
             }}
           />
           <label>Show mood colors</label>
         </Row>
         <label>Select moods to show on prompt:</label>
         <br />
-        {moodList.map((x) => (
-          <GoogleMatieralIcon
-            util={[
-              "clickable",
-              "lift-up",
-              "round",
-              userMoods.includes(x) ? "selected" : "giraffe",
-            ]}
-            size="48px"
-            outline={true}
-            style={combineStyles(
-              {
-                padding: "5px",
-              },
-              useColors ? { color: moodColorMap[moodMap[x]] } : {}
-            )}
-            name={`sentiment_${x}`}
-            onClick={() => toggle(x)}
+        <Row util={["small-gap"]} style={{ padding: "5px" }}>
+          {moodList.map((x) => (
+            <GoogleMatieralIcon
+              util={[
+                "clickable",
+                "lift-up",
+                "round",
+                settings.userMoods.includes(x) ? "selected" : "giraffe",
+              ]}
+              size="48px"
+              outline={true}
+              style={combineStyles(
+                {
+                  padding: "5px",
+                },
+                settings.useMoodColors
+                  ? { color: moodColorMap[moodMap[x]] }
+                  : {}
+              )}
+              name={`sentiment_${x}`}
+              onClick={() => toggle(x)}
+            />
+          ))}
+        </Row>
+        <Words type="heading">Miscellaneous</Words>
+        <Row style={{ margin: "10px" }}>
+          <input
+            type="checkbox"
+            defaultChecked={settings.enableTips}
+            checked={settings.enableTips}
+            onChange={(e) => {
+              setSetting("enableTips", e.currentTarget.checked);
+            }}
           />
-        ))}
-        <Words type="heading" style={{ display: "block" }}>
-          Shortcuts
-        </Words>
-        <ShortcutList />
+          <label>Show a random tip everyday</label>
+        </Row>
       </Container>
     </Column>
   );

@@ -1,3 +1,8 @@
+export interface User {
+  id: number;
+  settings: string;
+}
+
 export interface Task {
   id: number;
   user: number;
@@ -8,6 +13,7 @@ export interface Task {
   repeat: number | null;
   in_group: number | null;
   note: string | null;
+  tags: string | null;
 }
 
 export interface Group {

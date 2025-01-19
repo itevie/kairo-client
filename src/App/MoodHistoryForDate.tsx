@@ -1,14 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Column from "../dawn-ui/components/Column";
 import Container from "../dawn-ui/components/Container";
 import GoogleMatieralIcon from "../dawn-ui/components/GoogleMaterialIcon";
 import Row from "../dawn-ui/components/Row";
 import Words from "../dawn-ui/components/Words";
 import { combineStyles } from "../dawn-ui/util";
-import useTasks from "./hooks/useTasks";
-import { moodColorMap, moodMap, MoodType, moodTypes } from "./MoodLogger";
+import useMainHook from "./hooks/useMainHook";
+import { moodColorMap, moodMap } from "./MoodLogger";
 import { MoodLog } from "./types";
-import { ChartConfiguration } from "chart.js";
 import { DawnTime } from "../dawn-ui/time";
 
 export default function MoodHistoryForDate({
@@ -16,7 +15,7 @@ export default function MoodHistoryForDate({
   date,
 }: {
   date: string;
-  hook: ReturnType<typeof useTasks>;
+  hook: ReturnType<typeof useMainHook>;
 }) {
   const _moodMap = useMemo(() => {
     const t: Record<string, MoodLog[]> = {};
