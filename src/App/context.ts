@@ -1,13 +1,11 @@
 import {
-  createChannel,
-  Importance,
   isPermissionGranted,
   requestPermission,
   sendNotification,
 } from "@tauri-apps/plugin-notification";
 import { Group, Task } from "./types";
 
-function isTauri() {
+export function isTauri() {
   // @ts-ignore
   return typeof window !== "undefined" && window.__TAURI__.isTauri;
 }

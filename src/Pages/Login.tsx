@@ -5,8 +5,9 @@ import Button from "../dawn-ui/components/Button";
 import Link from "../dawn-ui/components/Link";
 import Row from "../dawn-ui/components/Row";
 
-// export const apiUrl = "http://localhost:3005";
-export const apiUrl = "https://kairo.dawn.rest";
+export const apiUrl = localStorage.getItem("base-url")
+  ? localStorage.getItem("base-url")
+  : "https://kairo.dawn.rest";
 
 export default function Login() {
   return (

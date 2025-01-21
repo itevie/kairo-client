@@ -9,6 +9,7 @@ import GoogleMatieralIcon from "../dawn-ui/components/GoogleMaterialIcon";
 import { combineStyles } from "../dawn-ui/util";
 import { spawnConfetti } from "../dawn-ui/confetti";
 import useSettings from "./hooks/useSettings";
+import Button from "../dawn-ui/components/Button";
 
 export default function SettingsPage({
   hook,
@@ -216,6 +217,11 @@ export default function SettingsPage({
             }}
           />
           <label>Show a random tip everyday</label>
+        </Row>
+        <Words type="heading">Actions</Words>
+        <Row>
+          <Button>Export Data</Button>
+          <Button>Import Data</Button>
         </Row>
       </Container>
     </Column>

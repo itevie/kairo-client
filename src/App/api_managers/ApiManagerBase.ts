@@ -13,33 +13,26 @@ export default abstract class ApiManagerBase {
   }
 
   //#region User Calls
-  abstract fetchUser(): Promise<AxiosResponse<User>>;
-  abstract updateUserSettings(value: string): Promise<AxiosResponse<User>>;
+  abstract fetchUser(): Promise<User>;
+  abstract updateUserSettings(value: string): Promise<User>;
+  abstract generateToken(): Promise<string>;
   //#endregion
 
   //#region Task Calls
-  abstract fetchTasks(): Promise<AxiosResponse<Task[]>>;
-  abstract addTask(data: Partial<Task>): Promise<AxiosResponse<Task>>;
-  abstract updateTask(
-    id: number,
-    data: Partial<Task>
-  ): Promise<AxiosResponse<Task>>;
+  abstract fetchTasks(): Promise<Task[]>;
+  abstract addTask(data: Partial<Task>): Promise<Task>;
+  abstract updateTask(id: number, data: Partial<Task>): Promise<Task>;
   abstract deleteTask(id: number): Promise<void>;
   //#endregion
 
   //#region Groups
-  abstract fetchGroups(): Promise<AxiosResponse<Group[]>>;
-  abstract addGroup(name: string): Promise<AxiosResponse<Group>>;
-  abstract updateGroup(
-    id: number,
-    data: Partial<Group>
-  ): Promise<AxiosResponse<Group>>;
+  abstract fetchGroups(): Promise<Group[]>;
+  abstract addGroup(name: string): Promise<Group>;
+  abstract updateGroup(id: number, data: Partial<Group>): Promise<Group>;
   //#endregion
 
   //#region Moods
-  abstract addMoodEntry(
-    data: Partial<MoodLog>
-  ): Promise<AxiosResponse<MoodLog>>;
-  abstract fetchMoodEntries(): Promise<AxiosResponse<MoodLog[]>>;
+  abstract addMoodEntry(data: Partial<MoodLog>): Promise<MoodLog>;
+  abstract fetchMoodEntries(): Promise<MoodLog[]>;
   //#endregion
 }

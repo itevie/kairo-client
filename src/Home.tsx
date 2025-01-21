@@ -3,17 +3,12 @@ import Navbar from "./dawn-ui/components/Navbar";
 import Row from "./dawn-ui/components/Row";
 import Container from "./dawn-ui/components/Container";
 import Button from "./dawn-ui/components/Button";
+import KairoNavbar from "./KairoNavbar";
 
 export default function App() {
   return (
     <>
-      <Navbar title="Kairo" breadcrumb>
-        <Row>
-          <Button onClick={() => (window.location.href = "/app")}>
-            Open App
-          </Button>
-        </Row>
-      </Navbar>
+      <KairoNavbar />
       <Page>
         <Container title="Kairo">
           Kairo is your personal journel featuring a mood tracker and highly

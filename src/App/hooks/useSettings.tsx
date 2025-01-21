@@ -97,7 +97,7 @@ export function SettingsDataProvider({ children }: { children: ReactNode }) {
       try {
         const x = await api.fetchUser();
         setSettings((old) => {
-          const result = JSON.parse(x.data.settings);
+          const result = JSON.parse(x.settings);
           const set: Partial<KairoSettings> = {};
 
           if (result.syncAppearance)
@@ -120,6 +120,7 @@ export function SettingsDataProvider({ children }: { children: ReactNode }) {
         });
       } catch (e) {
         console.log(e);
+        if (!window.location.pathname.startsWith("/app")) return;
         addAlert({
           title: "Are you logged in?",
           body: "Kairo failed to load your user settings, you might need to log in.",

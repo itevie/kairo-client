@@ -4,6 +4,7 @@ import ServerApiManager from "./api_managers/Server";
 
 const axiosClient = new AxiosWrapper();
 axiosClient.showLoader = false;
+axiosClient.noErrorMessage = true;
 axiosClient.config.withCredentials = true;
 axiosClient.config.baseURL = `${apiUrl}`;
 

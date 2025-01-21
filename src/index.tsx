@@ -11,6 +11,7 @@ import Login from "./Pages/Login";
 import Kairo from "./App/Kairo";
 import { FlyoutManager } from "./dawn-ui/components/Flyout";
 import { SettingsDataProvider } from "./App/hooks/useSettings";
+import TauriSetup from "./Pages/TauriSetup";
 
 let t = localStorage.getItem("kairo-theme");
 if (t) setTheme(t as any);
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
   {
     path: "/welcome",
     element: <Welcome />,
+  },
+  {
+    path: "/tauri",
+    element: <TauriSetup />,
   },
 ]);
 
