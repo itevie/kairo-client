@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Group, MoodLog, Task } from "../types";
 import { DawnTime } from "../../dawn-ui/time";
 import showMoodLogger from "../MoodLogger";
+import { checkNotifications, getCache } from "../context";
 import api from "../api";
 
 export type TaskHookType = ReturnType<typeof useMainHook>;
@@ -12,14 +13,17 @@ export default function useMainHook() {
   const [moods, setMoods] = useState<MoodLog[]>([]);
 
   useEffect(() => {
-    let taskCache = localStorage.getItem("kairo_task_cache");
-    if (taskCache) setTasks(JSON.parse(taskCache));
-    let groupCache = localStorage.getItem("kairo_group_cache");
-    if (groupCache) setGroups(JSON.parse(groupCache));
+    checkNotifications(tasks);
+  }, [tasks]);
+
+  useEffect(() => {
+    setTasks(getCache("tasks"));
+    setGroups(getCache("groups"));
 
     _fetchMoodEntries();
     reloadGroups();
     reloadTasks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ----- Tasks -----
