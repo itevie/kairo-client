@@ -31,3 +31,13 @@ export interface MoodLog {
   note: string | null;
   created_at: string;
 }
+
+export interface Streak {
+  id: number;
+  user: number;
+  title: string;
+  note: string | null;
+  type: "add" | "subtract";
+  start: string;
+  last_entry: string;
+}

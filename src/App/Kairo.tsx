@@ -23,6 +23,7 @@ import tips from "./tips";
 import MoodHistoryForDate from "./MoodHistoryForDate";
 import MoodHistory from "./MoodHistory";
 import { showGroupEditor } from "./GroupEditor";
+import StreakPage from "./StreakPage";
 
 registerShortcut("search", { key: "s", modifiers: ["ctrl"] });
 registerShortcut("new-task", { key: "n", modifiers: ["shift"] });
@@ -123,6 +124,12 @@ export default function Kairo() {
               <hr />
             </>
           )}
+          <SidebarButton
+            label="Streaks"
+            icon="local_fire_department"
+            onClick={() => setPage("streaks")}
+          />
+          <hr />
           {[
             ["Due", "due", "schedule"],
             ["All", "all", "list"],
@@ -193,6 +200,7 @@ export default function Kairo() {
             {{
               mood_history: <MoodHistory hook={tasks} setPage={setPage} />,
               settings: <SettingsPage hook={tasks} />,
+              streaks: <StreakPage />,
             }[page] ?? <TaskList hook={tasks} type={page as ListType} />}
           </>
         )}
