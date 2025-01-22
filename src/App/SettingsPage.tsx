@@ -10,6 +10,8 @@ import { combineStyles } from "../dawn-ui/util";
 import { spawnConfetti } from "../dawn-ui/confetti";
 import useSettings from "./hooks/useSettings";
 import Button from "../dawn-ui/components/Button";
+import api from "./api";
+import { addAlert } from "../dawn-ui/components/AlertManager";
 
 export default function SettingsPage({
   hook,
@@ -220,10 +222,27 @@ export default function SettingsPage({
         </Row>
         <Words type="heading">Actions</Words>
         <Row>
-          <Button>Export Data</Button>
+          <Button onClick={exportData}>Export Data</Button>
           <Button>Import Data</Button>
         </Row>
       </Container>
     </Column>
   );
+}
+
+async function exportData() {
+  const data = await api.fetchAllData();
+  addAlert({
+    title: "Your Data",
+    body: <textarea>{JSON.stringify(data)}</textarea>,
+    buttons: [
+      {
+        id: "ok",
+        text: "ok",
+        click(close) {
+          close();
+        },
+      },
+    ],
+  });
 }

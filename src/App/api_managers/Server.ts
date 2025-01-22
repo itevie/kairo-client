@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 import { Group, MoodLog, Task, User } from "../types";
-import ApiManagerBase from "./ApiManagerBase";
+import ApiManagerBase, { AllData } from "./ApiManagerBase";
 
 export default class ServerApiManager extends ApiManagerBase {
   public name: string = "Server";
@@ -17,6 +17,10 @@ export default class ServerApiManager extends ApiManagerBase {
         settings: value,
       })
     ).data;
+  }
+
+  async fetchAllData(): Promise<AllData> {
+    return (await this.axiosClient.get<AllData>(`/api/all`)).data;
   }
 
   async generateToken(): Promise<string> {

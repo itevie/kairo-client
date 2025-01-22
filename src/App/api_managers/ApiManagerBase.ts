@@ -2,6 +2,12 @@ import { AxiosResponse } from "axios";
 import { AxiosWrapper } from "../../dawn-ui/util";
 import { Group, MoodLog, Task, User } from "../types";
 
+export interface AllData {
+  tasks: Task[];
+  groups: Group[];
+  moods: MoodLog[];
+}
+
 export default abstract class ApiManagerBase {
   public abstract name: string;
   public abstract description: string;
@@ -16,6 +22,7 @@ export default abstract class ApiManagerBase {
   abstract fetchUser(): Promise<User>;
   abstract updateUserSettings(value: string): Promise<User>;
   abstract generateToken(): Promise<string>;
+  abstract fetchAllData(): Promise<AllData>;
   //#endregion
 
   //#region Task Calls

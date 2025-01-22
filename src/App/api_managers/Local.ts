@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 import { User, Task, Group, MoodLog } from "../types";
-import ApiManagerBase from "./ApiManagerBase";
+import ApiManagerBase, { AllData } from "./ApiManagerBase";
 import { AxiosWrapper } from "../../dawn-ui/util";
 
 export type Key = "tasks" | "groups" | "moods" | "settings";
@@ -58,6 +58,10 @@ export default class LocalApiManager extends ApiManagerBase {
   public async updateUserSettings(value: string): Promise<User> {
     await this.storage.set("settings", value);
     return await this.fetchUser();
+  }
+
+  public async fetchAllData(): Promise<AllData> {
+    throw new Error("Not Implemented");
   }
 
   public async generateToken(): Promise<string> {
