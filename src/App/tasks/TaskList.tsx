@@ -47,13 +47,11 @@ export default function TaskList({
     .filter(filters[type || "all"] || (() => true))
     .sort(
       (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     )
     .sort(
-      (a, b) => new Date(b.due || 0).getTime() - new Date(a.due || 0).getTime()
+      (a, b) => new Date(b.due || 0).getTime() - new Date(a.due || 0).getTime(),
     );
-
-  console.log(tasks);
 
   setShortcutCallback("search", () => {
     inputRef.current?.focus();
@@ -90,7 +88,7 @@ export default function TaskList({
 
               if (randomTasks.length === 0)
                 return showInfoAlert(
-                  `Oops! Looks like you've completed all the tasks in this tab. Well-done!`
+                  `Oops! Looks like you've completed all the tasks in this tab. Well-done!`,
                 );
 
               let randomTask = `id=${randomTasks[
@@ -130,7 +128,7 @@ export default function TaskList({
                   (d, v) => d.tags?.split(";").includes(v) ?? false,
                 ],
               ],
-            }).length > 0
+            }).length > 0,
         )
         .map((k) => (
           <TaskGroup

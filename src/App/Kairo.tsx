@@ -24,6 +24,7 @@ import MoodHistoryForDate from "./MoodHistoryForDate";
 import MoodHistory from "./MoodHistory";
 import { showGroupEditor } from "./GroupEditor";
 import StreakPage from "./StreakPage";
+import useSettings from "./hooks/useSettings";
 
 registerShortcut("search", { key: "s", modifiers: ["ctrl"] });
 registerShortcut("new-task", { key: "n", modifiers: ["shift"] });
@@ -39,6 +40,7 @@ registerShortcut("log-mood", {
 export default function Kairo() {
   const tasks = useMainHook();
   const [page, _setPage] = useState<string>("all");
+  const settings = useSettings();
 
   useEffect(() => {
     if (window.location.hash) {
@@ -62,7 +64,7 @@ export default function Kairo() {
       ) {
         localStorage.setItem(
           "kairo-last-tip",
-          DawnTime.formatDateString(new Date(), "YYYY-MM-DD")
+          DawnTime.formatDateString(new Date(), "YYYY-MM-DD"),
         );
         addAlert({
           title: "Daily Tip",
@@ -109,7 +111,7 @@ export default function Kairo() {
       <FAB shortcut={"new-task"} clicked={handleCreateTask} />
       <Sidebar>
         <Column util={["no-select"]} style={{ gap: "5px" }}>
-          {(localStorage.getItem("kairo-show-mood") ?? "true") === "true" && (
+          {settings.settings.showMood && (
             <>
               <SidebarButton
                 label="Log Mood"

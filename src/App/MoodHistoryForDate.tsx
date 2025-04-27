@@ -3,7 +3,7 @@ import Column from "../dawn-ui/components/Column";
 import Container from "../dawn-ui/components/Container";
 import GoogleMatieralIcon from "../dawn-ui/components/GoogleMaterialIcon";
 import Row from "../dawn-ui/components/Row";
-import Words from "../dawn-ui/components/Words";
+import Words, { TextType } from "../dawn-ui/components/Words";
 import { combineStyles } from "../dawn-ui/util";
 import useMainHook from "./hooks/useMainHook";
 import { moodColorMap, moodMap } from "./MoodLogger";
@@ -32,7 +32,7 @@ export default function MoodHistoryForDate({
 
   return (
     <Column>
-      <Words type="page-title">Entries for {date}</Words>
+      <Words type={TextType.PageTitle}>Entries for {date}</Words>
       {(_moodMap[date] ?? []).reverse().map((x) => (
         <Container util={["no-min"]}>
           <Row util={["align-center"]}>
@@ -49,7 +49,7 @@ export default function MoodHistoryForDate({
                           moodMap[x.emotion as keyof typeof moodMap]
                         ],
                     }
-                  : {}
+                  : {},
               )}
               size="32px"
               outline={true}

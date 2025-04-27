@@ -3,7 +3,7 @@ import Column from "../dawn-ui/components/Column";
 import Container from "../dawn-ui/components/Container";
 import GoogleMatieralIcon from "../dawn-ui/components/GoogleMaterialIcon";
 import Row from "../dawn-ui/components/Row";
-import Words from "../dawn-ui/components/Words";
+import Words, { TextType } from "../dawn-ui/components/Words";
 import { DawnTime } from "../dawn-ui/time";
 import { Streak } from "./types";
 
@@ -24,14 +24,14 @@ export default function StreakPage() {
 
   return (
     <Column>
-      <Words type="page-title">Your Streaks</Words>
+      <Words type={TextType.PageTitle}>Your Streaks</Words>
       <Container util={["no-min"]}>
         <Row util={["align-center"]}>
           <Column util={["align-center", "small-gap"]}>
             <GoogleMatieralIcon name="local_fire_department" />
             <label>{days} days</label>
           </Column>
-          <Words util={["flex-grow"]} type="heading">
+          <Words util={["flex-grow"]} type={TextType.Heading}>
             {streak.title}
           </Words>
           <Button className="dawn-button-circle">

@@ -2,7 +2,7 @@ import { setTheme, themeSetBackground } from "../dawn-ui";
 import Column from "../dawn-ui/components/Column";
 import Container from "../dawn-ui/components/Container";
 import Row from "../dawn-ui/components/Row";
-import Words from "../dawn-ui/components/Words";
+import Words, { TextType } from "../dawn-ui/components/Words";
 import useMainHook from "./hooks/useMainHook";
 import { moodColorMap, moodList, moodMap } from "./MoodLogger";
 import GoogleMatieralIcon from "../dawn-ui/components/GoogleMaterialIcon";
@@ -34,11 +34,11 @@ export default function SettingsPage({
 
   return (
     <Column util={["no-gap"]}>
-      <Words type="page-title">Settings</Words>
+      <Words type={TextType.PageTitle}>Settings</Words>
       <Container>
         {/* Appearance Settings */}
         <Row>
-          <Words type="heading">Appearance</Words>
+          <Words type={TextType.Heading}>Appearance</Words>
           <Row util={["align-center", "small-gap"]}>
             <input
               type="checkbox"
@@ -134,7 +134,7 @@ export default function SettingsPage({
         </table>
         {/* Mood Logger Settings */}
         <Row>
-          <Words style={{ flexShrink: "0" }} type="heading">
+          <Words style={{ flexShrink: "0" }} type={TextType.Heading}>
             Mood Tracker
           </Words>
           <Row util={["align-center", "small-gap"]}>
@@ -184,7 +184,7 @@ export default function SettingsPage({
         </Row>
         <label>Select moods to show on prompt:</label>
         <br />
-        <Row util={["small-gap"]} style={{ padding: "5px" }}>
+        <Row util={["small-gap", "flex-wrap"]} style={{ padding: "5px" }}>
           {moodList.map((x) => (
             <GoogleMatieralIcon
               util={[
@@ -201,14 +201,14 @@ export default function SettingsPage({
                 },
                 settings.useMoodColors
                   ? { color: moodColorMap[moodMap[x]] }
-                  : {}
+                  : {},
               )}
               name={`sentiment_${x}`}
               onClick={() => toggle(x)}
             />
           ))}
         </Row>
-        <Words type="heading">Miscellaneous</Words>
+        <Words type={TextType.Heading}>Miscellaneous</Words>
         <Row style={{ margin: "10px" }}>
           <input
             type="checkbox"
@@ -220,7 +220,7 @@ export default function SettingsPage({
           />
           <label>Show a random tip everyday</label>
         </Row>
-        <Words type="heading">Actions</Words>
+        <Words type={TextType.Heading}>Actions</Words>
         <Row>
           <Button onClick={exportData}>Export Data</Button>
           <Button>Import Data</Button>
