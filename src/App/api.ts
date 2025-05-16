@@ -2,7 +2,7 @@ import { AxiosWrapper } from "../dawn-ui/util";
 import { apiUrl } from "../Pages/Login";
 import ServerApiManager from "./api_managers/Server";
 
-const axiosClient = new AxiosWrapper();
+export const axiosClient = new AxiosWrapper();
 axiosClient.showLoader = false;
 axiosClient.noErrorMessage = true;
 axiosClient.config.withCredentials = true;

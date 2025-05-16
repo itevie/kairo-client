@@ -20,17 +20,13 @@ if (localStorage.getItem("kairo-backgroundImage"))
 loadTheme();
 
 const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
+  document.getElementById("root") as HTMLElement,
 );
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
-  },
-  {
-    path: "/app",
-    element: <Kairo />,
   },
   {
     path: "/login",
@@ -56,5 +52,5 @@ root.render(
     <FlyoutManager />
     <ContextMenuManager />
     <RouterProvider router={router} />
-  </SettingsDataProvider>
+  </SettingsDataProvider>,
 );
