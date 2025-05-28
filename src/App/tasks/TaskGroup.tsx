@@ -13,6 +13,7 @@ import GoogleMatieralIcon from "../../dawn-ui/components/GoogleMaterialIcon";
 import { getSearchResults } from "../../dawn-ui/seacher";
 import { getTagsFromTagString } from "../util";
 import Flyout from "../../dawn-ui/components/Flyout";
+import ProgressBar from "../../dawn-ui/components/ProgressBar";
 
 const collapseCache: { [key: string]: boolean } = {};
 
@@ -34,11 +35,10 @@ export default function TaskGroup({
   hook: TaskHookType;
 }) {
   const [collapsed, setCollapsed] = useState<boolean>(
-    collapseCache[group] || false
+    collapseCache[group] || false,
   );
 
   function _setCollapsed(state: boolean) {
-    console.log(group);
     collapseCache[group] = state;
     setCollapsed(state);
   }
@@ -50,20 +50,27 @@ export default function TaskGroup({
     custom: [[/@([a-z]+)/, (d, v) => d.tags?.split(";").includes(v) ?? false]],
   });
 
+  const amount = filtered.length;
+  const finished = filtered.filter((x) => x.finished).length;
+  const percent = (amount / finished) * 100;
+
   return (
     <>
       <Row
         util={["align-center", "no-gap", "no-select"]}
+        style={{ justifyContent: "space-between" }}
         onClick={() => _setCollapsed(!collapsed)}
       >
-        <label>
-          {group}
-          {group.length !== 0 ? " - " : ""}
-          {filtered.length} items{" "}
-        </label>
-        <GoogleMatieralIcon
-          name={collapsed ? "arrow_right" : "arrow_drop_down"}
-        />
+        <Row util={["no-gap"]}>
+          <label>
+            {group}
+            {group.length !== 0 ? " - " : ""}
+            {filtered.length} items{" "}
+          </label>
+          <GoogleMatieralIcon
+            name={collapsed ? "arrow_right" : "arrow_drop_down"}
+          />
+        </Row>
       </Row>
       <Column style={{ margin: "3px", display: collapsed ? "none" : "flex" }}>
         {filtered.map((x) => (
@@ -72,7 +79,7 @@ export default function TaskGroup({
               x.due && !x.finished && Date.now() - new Date(x.due).getTime() > 0
                 ? "dawn-danger"
                 : "",
-              selected.includes(x.id) ? "dawn-selected" : ""
+              selected.includes(x.id) ? "dawn-selected" : "",
             )}
             onClick={(e) => {
               if (e.ctrlKey) {
@@ -133,7 +140,7 @@ export default function TaskGroup({
                                 "repeat",
                                 new DawnTime(x.repeat || 0).toString(),
                                 `Repeats every ${new DawnTime(
-                                  x.repeat || 0
+                                  x.repeat || 0,
                                 ).toString()}`,
                               ]
                             : null,
@@ -142,14 +149,14 @@ export default function TaskGroup({
                                 "sell",
                                 getTagsFromTagString(x.tags).join(", "),
                                 `Tags: ${getTagsFromTagString(x.tags).join(
-                                  ", "
+                                  ", ",
                                 )}`,
                               ]
                             : null,
                         ].filter((x) => x !== null) as [
                           string,
                           string,
-                          string
+                          string,
                         ][]
                       ).map((x) => (
                         <Flyout text={x[2] || ""} timeout={250}>

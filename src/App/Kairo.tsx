@@ -1,37 +1,42 @@
 import { useEffect, useState } from "react";
-import { addAlert, showInputAlert } from "../dawn-ui/components/AlertManager";
-import Column from "../dawn-ui/components/Column";
+import { addAlert } from "../dawn-ui/components/AlertManager";
 import Content from "../dawn-ui/components/Content";
 import FAB from "../dawn-ui/components/FAB";
 import Row from "../dawn-ui/components/Row";
-import Sidebar from "../dawn-ui/components/Sidebar";
-import SidebarButton from "../dawn-ui/components/SidebarButton";
 import TaskList, { ListType } from "./tasks/TaskList";
 import useMainHook from "./hooks/useMainHook";
 import showTaskEditor from "./tasks/TaskEditor";
-import {
-  registerShortcut,
-  setShortcutCallback,
-} from "../dawn-ui/components/ShortcutManager";
 import showMoodLogger from "./MoodLogger";
 import SettingsPage from "./SettingsPage";
 import "react-calendar/dist/Calendar.css";
 import { DawnTime } from "../dawn-ui/time";
 import "./style.css";
-import { showContextMenu } from "../dawn-ui/components/ContextMenuManager";
-import tips from "./tips";
+import tips, { showTip } from "./tips";
 import MoodHistoryForDate from "./MoodHistoryForDate";
 import MoodHistory from "./MoodHistory";
-import { showGroupEditor } from "./GroupEditor";
 import StreakPage from "./StreakPage";
 import useSettings from "./hooks/useSettings";
+import { ShortcutManager } from "../dawn-ui/components/ShortcutManager";
+import KairoSidebar from "./Sidebar";
 
-registerShortcut("search", { key: "s", modifiers: ["ctrl"] });
-registerShortcut("new-task", { key: "n", modifiers: ["shift"] });
-registerShortcut("settings", { key: "s", modifiers: ["ctrl", "alt"] });
-registerShortcut("select-all", { key: "a", modifiers: ["ctrl"] });
-registerShortcut("deselect-all", { key: "a", modifiers: ["shift", "ctrl"] });
-registerShortcut("log-mood", {
+ShortcutManager.registerShortcut("search", { key: "s", modifiers: ["ctrl"] });
+ShortcutManager.registerShortcut("new-task", {
+  key: "n",
+  modifiers: ["shift"],
+});
+ShortcutManager.registerShortcut("settings", {
+  key: "s",
+  modifiers: ["ctrl", "alt"],
+});
+ShortcutManager.registerShortcut("select-all", {
+  key: "a",
+  modifiers: ["ctrl"],
+});
+ShortcutManager.registerShortcut("deselect-all", {
+  key: "a",
+  modifiers: ["shift", "ctrl"],
+});
+ShortcutManager.registerShortcut("log-mood", {
   key: "l",
   modifiers: ["shift"],
   callback: showMoodLogger,
@@ -50,10 +55,11 @@ export default function Kairo() {
     }
 
     window.addEventListener("hashchange", () => {
-      setPage(window.location.hash.replace("#", ""));
+      let temp = window.location.hash.replace("#", "");
+      if (temp !== page) setPage(temp);
     });
 
-    setShortcutCallback("settings", () => {
+    ShortcutManager.setShortcutCallback("settings", () => {
       setPage("settings");
     });
 
@@ -66,27 +72,7 @@ export default function Kairo() {
           "kairo-last-tip",
           DawnTime.formatDateString(new Date(), "YYYY-MM-DD"),
         );
-        addAlert({
-          title: "Daily Tip",
-          body: <label>{tips[Math.floor(Math.random() * tips.length)]}</label>,
-          buttons: [
-            {
-              id: "disable",
-              text: "Disable Tips",
-              click(close) {
-                localStorage.setItem("kairo-enable-tips", "false");
-                close();
-              },
-            },
-            {
-              id: "ok",
-              text: "OK!",
-              click(close) {
-                close();
-              },
-            },
-          ],
-        });
+        showTip();
       }
     }
   }, []);
@@ -102,6 +88,10 @@ export default function Kairo() {
     tasks.createTask(result);
   }
 
+  useEffect(() => {
+    document.title = `Kairo: ${page}`;
+  }, [page]);
+
   return (
     <Row
       className="full-page"
@@ -109,84 +99,12 @@ export default function Kairo() {
       style={{ position: "relative" }}
     >
       <FAB shortcut={"new-task"} clicked={handleCreateTask} />
-      <Sidebar>
-        <Column util={["no-select"]} style={{ gap: "5px" }}>
-          {settings.settings.showMood && (
-            <>
-              <SidebarButton
-                label="Log Mood"
-                icon="add"
-                onClick={showMoodLogger}
-              />
-              <SidebarButton
-                label="Mood History"
-                icon="calendar_month"
-                onClick={() => setPage("mood_history")}
-              />
-              <hr />
-            </>
-          )}
-          <SidebarButton
-            label="Streaks"
-            icon="local_fire_department"
-            onClick={() => setPage("streaks")}
-          />
-          <hr />
-          {[
-            ["Due", "due", "schedule"],
-            ["All", "all", "list"],
-            ["Tagged", "tagged", "sell"],
-            ["Reapting", "repeating", "replay"],
-            ["Finished", "finished", "task_alt"],
-          ].map((x) => (
-            <SidebarButton
-              label={x[0]}
-              icon={x[2]}
-              selected={page === x[1]}
-              onClick={() => setPage(x[1])}
-            />
-          ))}
-          <hr />
-          {tasks.groups.map((x) => (
-            <SidebarButton
-              key={x.id}
-              label={x.name}
-              icon="folder"
-              selected={page === `group-${x.id}`}
-              onClick={() => setPage(`group-${x.id}`)}
-              style={x.theme ? { color: x.theme } : {}}
-              onContextMenu={(e) => {
-                showContextMenu({
-                  event: e,
-                  elements: [
-                    {
-                      type: "button",
-                      label: "Edit",
-                      onClick: () => {
-                        showGroupEditor(x, tasks);
-                      },
-                    },
-                  ],
-                });
-              }}
-            />
-          ))}
-          {tasks.groups.length > 0 && <hr />}
-          <SidebarButton
-            label="New Group"
-            icon="folder"
-            onClick={async () => {
-              const name = await showInputAlert("Enter group name");
-              if (name) tasks.createGroup(name);
-            }}
-          />
-          <SidebarButton
-            label="Settings"
-            icon="settings"
-            onClick={() => setPage("settings")}
-          />
-        </Column>
-      </Sidebar>
+      <KairoSidebar
+        tasks={tasks}
+        page={page}
+        setPage={setPage}
+        settings={settings}
+      />
       <Content
         style={{
           width: "100%",

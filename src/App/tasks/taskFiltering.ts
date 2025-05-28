@@ -19,22 +19,22 @@ export function filterTasks(tasks: Task[], query: string): Task[] {
       x.title.match(regex) ||
       x.note?.match(regex) ||
       x.due?.match(regex) ||
-      x.created_at.match(regex)
+      x.created_at.match(regex),
   );
 }
 
 export function groupTasks(
   tasks: Task[],
   groups: Group[],
-  type: ListType | undefined
+  type: ListType | undefined,
 ) {
   let data: { [key: string]: Task[] } = {};
 
   switch (type) {
     case "due":
       data = {
-        Overdue: [],
         Today: [],
+        Overdue: [],
         Tomorrow: [],
         "In a week": [],
         Later: [],
@@ -97,10 +97,10 @@ export function groupTasks(
       if (type?.startsWith("group")) {
         data = {
           "": tasks.filter(
-            (x) => !x.finished && x.in_group?.toString() === type.split("-")[1]
+            (x) => !x.finished && x.in_group?.toString() === type.split("-")[1],
           ),
           Finished: tasks.filter(
-            (x) => x.finished && x.in_group?.toString() === type.split("-")[1]
+            (x) => x.finished && x.in_group?.toString() === type.split("-")[1],
           ),
         };
       }

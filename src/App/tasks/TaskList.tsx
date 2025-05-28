@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import Column from "../../dawn-ui/components/Column";
 import Row from "../../dawn-ui/components/Row";
 import { Task } from "../types";
-import { setShortcutCallback } from "../../dawn-ui/components/ShortcutManager";
 import { TaskSelectionControls } from "./TaskSelectionControls";
 import { filterTasks, groupTasks } from "./taskFiltering";
 import { TaskHookType } from "../hooks/useMainHook";
@@ -10,6 +9,7 @@ import Button from "../../dawn-ui/components/Button";
 import { showInfoAlert } from "../../dawn-ui/components/AlertManager";
 import TaskGroup from "./TaskGroup";
 import { getSearchResults } from "../../dawn-ui/seacher";
+import { ShortcutManager } from "../../dawn-ui/components/ShortcutManager";
 
 export type ListType =
   | "due"
@@ -53,20 +53,27 @@ export default function TaskList({
       (a, b) => new Date(b.due || 0).getTime() - new Date(a.due || 0).getTime(),
     );
 
-  setShortcutCallback("search", () => {
+  ShortcutManager.setShortcutCallback("search", () => {
     inputRef.current?.focus();
   });
 
-  setShortcutCallback("select-all", () => {
+  ShortcutManager.setShortcutCallback("select-all", () => {
     if (selected.length === tasks.length) setSelected([]);
     else setSelected(filterTasks(tasks, query).map((x) => x.id));
   });
 
-  setShortcutCallback("deselect-all", () => {
+  ShortcutManager.setShortcutCallback("deselect-all", () => {
     setSelected([]);
   });
 
   const data = groupTasks(tasks, hook.groups, type);
+  const vals = Object.values(data);
+  const amount = vals.reduce((p, c) => p + c.length, 0);
+  const finished = vals.reduce(
+    (p, c) => p + c.filter((x) => x.finished).length,
+    0,
+  );
+  const percent = (100 * finished) / amount;
 
   return (
     <Column>
@@ -103,6 +110,19 @@ export default function TaskList({
           </Button>
         </Row>
       </Row>
+
+      {type?.startsWith("group-") && !Number.isNaN(percent) ? (
+        <Row
+          util={["fit-content"]}
+          style={{ alignSelf: "flex-end", marginBottom: "-40px" }}
+        >
+          <label>{percent}%</label>
+          <progress max={100} value={percent}></progress>
+        </Row>
+      ) : (
+        <></>
+      )}
+
       {selected.length > 0 && (
         <div style={{ textAlign: "center" }}>
           <hr />
@@ -115,6 +135,7 @@ export default function TaskList({
           <hr />
         </div>
       )}
+
       {Object.keys(data)
         .filter(
           (x) =>

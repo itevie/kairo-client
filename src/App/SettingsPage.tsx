@@ -12,6 +12,7 @@ import useSettings from "./hooks/useSettings";
 import Button from "../dawn-ui/components/Button";
 import api from "./api";
 import { addAlert } from "../dawn-ui/components/AlertManager";
+import { ShortcutList } from "../dawn-ui/components/ShortcutManager";
 
 export default function SettingsPage({
   hook,
@@ -225,6 +226,8 @@ export default function SettingsPage({
           <Button onClick={exportData}>Export Data</Button>
           <Button>Import Data</Button>
         </Row>
+        <Words type={TextType.Heading}>Shortcuts</Words>
+        <ShortcutList />
       </Container>
     </Column>
   );
